@@ -1,0 +1,159 @@
+# Get better (and actionable) alerts from your Orchestration Pipelines
+
+- [Get better (and actionable) alerts from your Orchestration Pipelines](#get-better-and-actionable-alerts-from-your-orchestration-pipelines)
+  - [Introduction](#introduction)
+  - [Replacing Azure Monitor Alerts with informational emails](#replacing-azure-monitor-alerts-with-informational-emails)
+    - [The end result](#the-end-result)
+    - [Prerequisites](#prerequisites)
+      - [Sending mails through Microsoft Graph](#sending-mails-through-microsoft-graph)
+      - [Infrastructure](#infrastructure)
+      - [RBAC Permissions](#rbac-permissions)
+      - [You need to deploy](#you-need-to-deploy)
+    - [Implementation](#implementation)
+      - [Templates](#templates)
+      - [Configuration](#configuration)
+        - [Azure Function Application Properties](#azure-function-application-properties)
+        - [Azure Monitor Alert](#azure-monitor-alert)
+  - [Replacing Azure Monitor Alerts with Actionable Messages](#replacing-azure-monitor-alerts-with-actionable-messages)
+    - [The end result](#the-end-result-1)
+    - [Prerequisites](#prerequisites-1)
+      - [Sending mails through Microsoft Graph](#sending-mails-through-microsoft-graph-1)
+      - [Register as an Actionable Message sender in your Organization](#register-as-an-actionable-message-sender-in-your-organization)
+      - [Infrastructure](#infrastructure-1)
+      - [RBAC Permissions](#rbac-permissions-1)
+      - [You need to deploy](#you-need-to-deploy-1)
+    - [Implementation](#implementation-1)
+      - [Templates](#templates-1)
+      - [Configuration](#configuration-1)
+        - [Azure Function Application Properties](#azure-function-application-properties-1)
+        - [Azure Monitor Alert](#azure-monitor-alert-1)
+  - [3rd party libraries](#3rd-party-libraries)
+
+
+## Introduction
+This project is here to help you move from the traditional *A pipeline has failed* emails send from Azure Monitor into something that's easier to work with and requires less detective work to begin remediating.
+
+The current state of alerts: \
+<img src="./Documentation/AzureMonitorAlert.png" alt="Azure Monitor alert Out of the box" width="300"/>
+
+## Replacing Azure Monitor Alerts with informational emails
+### The end result
+Let's first start by showing what you'll achieve by implementing this approach: \
+<img src="./Documentation/InformativeEmail.png" alt="A more informative email about the alert" width="500"/>
+
+### Prerequisites
+
+#### Sending mails through Microsoft Graph
+You will need to get an Azure Entra Id Application setup with **Application** permission to send emails from a single mailbox.  
+See [this documentation article](https://learn.microsoft.com/en-us/graph/auth-limit-mailbox-access) for more info on how to achive this.
+
+You will need the following information:
+* Tenant Id
+* Application Id
+* Client Secret
+* ObjectId of the account sending the email
+* Email Address of the account sending the email
+
+#### Infrastructure
+
+*I have not yet found the time to include IaC templates to this project, but I do accept pull requets.*
+
+In order to use this setup, you'll need:
+* One (or more) instance(s) of Data Factory
+* One Azure Function App running .NET 8 in Isolated Worker Mode with an assigned Managed Identity (system/user assigned)
+* One Azure Monitor Alert - see [Azure Monitor Alert](#azure-monitor-alert)
+
+#### RBAC Permissions
+
+In order to be able to query the telemetry from Data Factory, the Function Apps Managed Identity needs to be granted the **Monitoring Reader** role on the Data Factory Instance.
+
+#### You need to deploy 
+
+The Azure Functions project available in the Src folder.
+
+### Implementation
+
+#### Templates
+
+To set your own design on the email that is sent, you'll need to update the following templates:
+* [ErrorMailBody.html](./Src/OrchestrationPipelinesAlert/Templates/Mail/ErrorMailBody.html)
+* [ErrorMailSubject.txt](./Src/OrchestrationPipelinesAlert/Templates/Mail/ErrorMailSubject.txt)
+
+Please pay attention to the [Handlebars syntax in the templates](https://handlebarsjs.com/).
+
+#### Configuration
+
+##### Azure Function Application Properties
+
+The following properties has to be setup:
+```json
+{
+    "Values": {
+        "MicrosoftGraph_SendMailClientId": "Client Id from application setup under prerequisites",
+        "MicrosoftGraph_SendMailTenantId":  "Tenant Id from application setup under prerequisites",
+        "MicrosoftGraph_SendMailClientSecret": "Client Secret from application setup under prerequisites",
+        "MicrosoftGraph_SendMailSenderObjectId": "Object Id of sender from application setup under prerequisites",
+        "MicrosoftGraph_SendMailSenderEmail":  "Email Address of sender from application setup under prerequisites",
+        "MicrosoftGraph_SendMailRecieverEmail": "Semi-colon separated list of receivers of the alerts"
+    }
+}
+```
+
+##### Azure Monitor Alert
+
+You'll need to setup an Alert on your Data Factory Instance: \
+<img src="./Documentation/CreateAlertRule.png" alt="Create a new alert rule" width="500"/> \
+The alert should trigger on *Failed pipeline runs metric* abd check every 1 minute with a lookback of 1 minute.
+
+Skip the notifications step, where you would normally configure email notifications: \
+<img src="./Documentation/CreateActionGroup-SkipNotifications.png" alt="Do not set up any notifications" width="500"/>
+
+Instead, add a new Action to invoke an Azure Function: \
+<img src="./Documentation/CreateActionGroup-AddFunctionAction.png" alt="Add an Azure Function action" width="500"/> \
+
+You can here just select the desired function (PipelineFailedSendMail).  Be sure to select to use the Common Alert Schema: \
+<img src="./Documentation/CreateActionGroup-AddFunctionActionDetails.png" alt="Be sure to use the common alert schema" width="500"/> \
+
+
+## Replacing Azure Monitor Alerts with Actionable Messages
+### The end result
+Let's first start by showing what you'll achieve by implementing this approach: \
+<img src="./Documentation/ActionableMessage.png" alt="An actionable message allows you to take action, right from within your mailbox" width="500"/> 
+
+### Prerequisites
+
+#### Sending mails through Microsoft Graph
+
+#### Register as an Actionable Message sender in your Organization
+https://aka.ms/publishoam
+
+#### Infrastructure
+
+*I have not yet found the time to include IaC templates to this project, but I do accept pull requests.*
+
+#### RBAC Permissions
+
+#### You need to deploy 
+
+### Implementation
+
+#### Templates
+
+#### Configuration
+
+##### Azure Function Application Properties
+
+##### Azure Monitor Alert
+
+## 3rd party libraries
+
+To save time I used a couple of excellent resources available online, and I want to thank the creators for
+allowing me to do so:
+
+[Handlebars.Net](https://github.com/Handlebars-Net/Handlebars.Net) nuget is used for handling templates. \
+This is used to generate the mail body and subjects. \
+It is licensed under MIT license.
+
+[o365-actionable-messages-utilities-for-dotnet](https://github.com/OfficeDev/o365-actionable-messages-utilities-for-dotnet/tree/master) code snippets are used for validating
+actions taken by the end users in the actionable messages. \
+It is licensed under MIT license.

@@ -1,0 +1,282 @@
+{
+    "type": "AdaptiveCard",
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.0",
+    "hideOriginalBody": true,
+    "padding": "None",
+    "@type": "AdaptiveCard",
+    "@context": "http://schema.org/extensions",
+    "originator": "{{ActionableMessageOriginator}}",
+    "body": [
+        {
+            "type": "ColumnSet",
+            "style": "emphasis",
+            "columns": [
+                {
+                    "type": "Column",
+                    "items": [
+                        {
+                            "type": "Image",
+                            "id": "faca2019-0d7c-0909-a8a6-bdb03f0d4484",
+                            "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgd2lkdGg9IjE2cHgiIGhlaWdodD0iMTZweCIgdmlld0JveD0iMCAwIDE2IDE2IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPg0KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwKSI+DQo8cGF0aCBkPSJNOCAxNkM5LjU4MjI1IDE2IDExLjEyOSAxNS41MzA4IDEyLjQ0NDYgMTQuNjUxOEMxMy43NjAyIDEzLjc3MjcgMTQuNzg1NSAxMi41MjMzIDE1LjM5MSAxMS4wNjE1QzE1Ljk5NjUgOS41OTk2NiAxNi4xNTUgNy45OTExMyAxNS44NDYzIDYuNDM5MjhDMTUuNTM3NiA0Ljg4NzQzIDE0Ljc3NTcgMy40NjE5NyAxMy42NTY5IDIuMzQzMTVDMTIuNTM4IDEuMjI0MzMgMTEuMTEyNiAwLjQ2MjQwMyA5LjU2MDcyIDAuMTUzNzIxQzguMDA4ODcgLTAuMTU0OTYgNi40MDAzNCAwLjAwMzQ2NjI1IDQuOTM4NTMgMC42MDg5NjdDMy40NzY3MiAxLjIxNDQ3IDIuMjI3MjkgMi4yMzk4NSAxLjM0ODI0IDMuNTU1NDRDMC40NjkxOTIgNC44NzEwMyAwIDYuNDE3NzUgMCA4QzAgMTAuMTIxNyAwLjg0Mjg1NSAxMi4xNTY2IDIuMzQzMTUgMTMuNjU2OUMzLjg0MzQ0IDE1LjE1NzEgNS44NzgyNyAxNiA4IDE2WiIgZmlsbD0iI0UwMEIxQyIvPg0KPHBhdGggZD0iTTEyLjU5NDEgNC42MjgwNUwxMS4xNzIxIDMuMjA2MDVMNy45MDAwNSA2LjQ3ODA1TDQuNjI4MDUgMy4yMDYwNUwzLjIwNjA1IDQuNjI4MDVMNi40NzgwNSA3LjkwMDA1TDMuMjA2MDUgMTEuMTcyMUw0LjYyODA1IDEyLjU5NDFMNy45MDAwNSA5LjMyMjA1TDExLjE3MjEgMTIuNTk0MUwxMi41OTQxIDExLjE3MjFMOS4zMjIwNSA3LjkwMDA1TDEyLjU5NDEgNC42MjgwNVoiIGZpbGw9IiNGRkZGRkYiLz4NCjwvZz4NCjxkZWZzPg0KPGNsaXBQYXRoIGlkPSJjbGlwMCI+DQo8cmVjdCB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIGZpbGw9IndoaXRlIi8+DQo8L2NsaXBQYXRoPg0KPC9kZWZzPg0KPC9zdmc+",
+                            "size": "Small",
+                            "spacing": "None"
+                        }
+                    ],
+                    "width": "auto",
+                    "padding": "None"
+                },
+                {
+                    "type": "Column",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "text": "Pipeline failed",
+                            "wrap": true,
+                            "size": "ExtraLarge",
+                            "weight": "Bolder"
+                        }
+                    ],
+                    "width": "stretch",
+                    "padding": "None",
+                    "verticalContentAlignment": "Center"
+                },
+                {
+                    "type": "Column",
+                    "id": "8eb13f1f-9e2e-d125-23aa-01a915c41c01",
+                    "padding": "None",
+                    "width": "auto",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "id": "2f557ff8-8a06-e8a4-b06b-65631d3bbbe7",
+                            "text": "({{Environment}})",
+                            "wrap": true
+                        }
+                    ],
+                    "verticalContentAlignment": "Center",
+                    "horizontalAlignment": "Right"
+                }
+            ],
+            "padding": "Default",
+            "spacing": "None"
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "size": "Large",
+                    "weight": "Bolder",
+                    "text": "{{PipelineRun.PipelineName}} - {{FailedActivityCount}} error(s) occurred",
+                    "wrap": true,
+                    "style": "heading",
+                    "color": "Attention"
+                }
+            ],
+            "padding": "Default",
+            "spacing": "None",
+            "separator": true
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "text": "*An error has occurred while executing an Orchestration pipeline.*\n\n*Please choose how to process this error*",
+                    "wrap": true
+                },
+                {
+                    "type": "FactSet",
+                    "id": "a46a50e6-11c3-27bb-349f-b40d820a7b83",
+                    "facts": [
+                        {
+                            "title": "Data Factory Instance:",
+                            "value": "{{DataFactoryResourceName}} ({{Environment}})"
+                        },
+                        {
+                            "title": "Pipeline Run id:",
+                            "value": "[{{PipelineRun.RunId}} (click to open)](https://adf.azure.com/monitoring/pipelineruns/{{PipelineRun.RunId}}?factory={{DataFactoryInstanceURLEncoded}})"
+                        },
+                        {
+                            "title": "Pipeline started:",
+                            "value": "{{PipelineRunStart}}"
+                        },
+                        {
+                            "title": "Pipeline finished:",
+                            "value": "{{PipelineRunEnd}}"
+                        }
+                    ],
+                    "spacing": "Medium",
+                    "separator": true
+                },
+                {{#if HasFailedActivities}}
+                {{#each FailedActivities}}
+                {
+                    "type": "Container",
+                    "id": "{{NewGuid}}",
+                    "padding": "None",
+                    "style": "{{IsEvenAdaptiveCard @index}}{{/IsEvenAdaptiveCard}}",
+                    "items": [
+                      {
+                          "type": "ColumnSet",
+                          "columns": [
+                              {
+                                  "type": "Column",
+                                  "id": "{{NewGuid}}",
+                                  "padding": "None",
+                                  "width": 50,
+                                  "items": [
+                                      {
+                                          "type": "FactSet",
+                                          "id": "{{NewGuid}}",
+                                          "facts": [
+                                              {
+                                                  "title": "Activity Name:",
+                                                  "value": "{{ActivityRunInformation.ActivityName}}"
+                                              },
+                                              {
+                                                  "title": "Activity Type:",
+                                                  "value": "{{ActivityRunInformation.ActivityType}}"
+                                              }
+                                          ],
+                                          "separator": true
+                                      }
+                                  ]
+                              },
+                              {
+                                  "type": "Column",
+                                  "id": "{{NewGuid}}",
+                                  "padding": "None",
+                                  "width": 50,
+                                  "items": [
+                                      {
+                                          "type": "FactSet",
+                                          "id": "{{NewGuid}}",
+                                          "facts": [
+                                              {
+                                                  "title": "Activity started:",
+                                                  "value": "{{ActivityStart}}"
+                                              },
+                                              {
+                                                  "title": "Activity finished:",
+                                                  "value": "{{ActivityEnd}}"
+                                              }
+                                          ],
+                                          "separator": true
+                                      }
+                                  ]
+                              }
+                          ],
+                          "padding": "None"
+                      },
+                      {
+                          "type": "FactSet",
+                          "id": "{{NewGuid}}",
+                          "facts": [
+                              {{#if HasActivityInputs}}
+                              {
+                                  "title": "Input [{{ActivityInput.VariableName}}]",
+                                  "value": "{{ActivityInput.Value}}"
+                              },
+                              {{/if}}
+                              {
+                                  "title": "Error:",
+                                  "value": "**{{ActivityError.Message}}**"
+                              }
+                          ]
+                      }
+                    ]
+                }{{#if @last}}{{else}},{{/if}}
+                {{/each}}
+                {{else}}
+                {
+                    "type": "TextBlock",
+                    "text": "There are no activity errors in this pipeline",
+                    "wrap": true
+                }
+                {{/if}}
+            ],
+            "padding": {
+                "top": "None",
+                "bottom": "Default",
+                "left": "Default",
+                "right": "Default"
+            },
+            "spacing": "None"
+        },
+        {
+            "type": "Container",
+            "id": "{{NewGuid}}",
+            "padding": "Default",
+            "items": [
+                {
+                    "type": "ActionSet",
+                    "id": "a732bf33-78fc-d899-de06-ca0b917fc23b",
+                    "actions": [
+                        {
+                            "type": "Action.Http",
+                            "id": "bb851aa1-6ebb-b7ce-b0c2-45e580ad6c8f",
+                            "title": "Rerun failed pipeline",
+                            "url": "{{AzureFunctionsRootUrl}}/PipelineFailedProcessAction",
+                            "method": "POST",
+                            "style": "positive",
+                            "isPrimary": true,
+                            "body": "{ \"Action\": \"Rerun\", \"PipelineRunId\": \"{{PipelineRun.RunId}}\", \"DataFactoryInstanceId\": \"{{DataFactoryInstanceId}}\" }"
+                        },
+                        {
+                            "type": "Action.Http",
+                            "id": "3119ec67-f387-18b7-b6be-af9bbd339745",
+                            "title": "Escalate to BI Ops",
+                            "method": "POST",
+                            "url": "{{AzureFunctionsRootUrl}}/PipelineFailedProcessAction",
+                            "body": "{ \"Action\": \"Escalate\", \"PipelineRunId\": \"{{PipelineRun.RunId}}\", \"DataFactoryInstanceId\": \"{{DataFactoryInstanceId}}\" }"
+                        },
+                        {
+                            "type": "Action.Http",
+                            "id": "fab3cc24-2bda-6063-5127-6aac05d5337f",
+                            "title": "Create task in Azure DevOps",
+                            "method": "POST",
+                            "url": "{{AzureFunctionsRootUrl}}/PipelineFailedProcessAction",
+                            "body": "{ \"Action\": \"Create task\", \"PipelineRunId\": \"{{PipelineRun.RunId}}\", \"DataFactoryInstanceId\": \"{{DataFactoryInstanceId}}\" }"
+                        }
+                    ]
+                }
+            ],
+            "spacing": "None",
+            "separator": true,
+            "isVisible": {{#if showButtons}}true{{else}}false{{/if}}
+        },
+        {
+            "type": "Container",
+            "id": "{{NewGuid}}",
+            "padding": "Default",
+            "isVisible": {{#if showButtons}}false{{else}}true{{/if}},
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "id": "1964ff43-e793-9012-e9ff-d4fd4d93a285",
+                    "text": "{{ActionUser}} choose to:",
+                    "wrap": true
+                },
+                {
+                    "type": "TextBlock",
+                    "id": "1154263c-1493-f87b-4238-090734329a05",
+                    "text": "*{{DecidedAction}}*",
+                    "wrap": true,
+                    "horizontalAlignment": "Center",
+                    "color": "Warning",
+                    "size": "Medium"
+                }
+            ],
+            "spacing": "None",
+            "separator": true
+        }
+    ],
+    "autoInvokeAction": {
+      "method": "POST",
+      "url": "{{AzureFunctionsRootUrl}}/PipelineFailedUpdateActionableMessage",
+      "body": "{ \"PipelineRunId\": \"{{PipelineRun.RunId}}\", \"DataFactoryInstanceId\": \"{{DataFactoryInstanceId}}\" }",
+      "type": "Action.Http"
+    }
+}

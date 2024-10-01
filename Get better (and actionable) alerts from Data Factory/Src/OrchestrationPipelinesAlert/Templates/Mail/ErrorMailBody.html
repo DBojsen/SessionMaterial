@@ -1,0 +1,104 @@
+﻿<html>
+
+<head>
+    <style>
+        th, td {
+            padding: 4px 0px 4px 0px;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .OddRow {
+            background-color: #f5f5f5;
+        }
+
+        body {
+            font-size: 13px;
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1;
+            font-weight: 400;
+            color: #6f6f6f;
+        }
+
+        img {
+            padding: 10px 0px 10px 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Content">
+        <img alt="logo" src="https://tabulareditor.com/assets/te3-logo-with-text-BfJZP4Da.svg" height="40px" width="204px">
+        <table>
+            <tr>
+                <td colspan="2">
+                    <h1 style="color: red;">{{PipelineRun.PipelineName}} - {{FailedActivityCount}} error(s) occurred</h1><br />
+                    <table width="100%" style="padding-bottom: 5px">
+                        <tr>
+                            <td width="150">Data Factory Instance:</td>
+                            <td>{{DataFactoryResourceName}} ({{Environment}})</td>
+                        </tr>
+                        <tr>
+                            <td>Pipeline Run id:</td>
+                            <td><a href="https://adf.azure.com/monitoring/pipelineruns/{{PipelineRun.RunId}}?factory={{DataFactoryInstanceURLEncoded}}">{{PipelineRun.RunId}} (click to open)</a></td>
+                        </tr>
+                        <tr>
+                            <td>Pipeline started:</td>
+                            <td>{{PipelineRunStart}}</td>
+                        </tr>
+                        <tr>
+                            <td>Pipeline finished:</td>
+                            <td>{{PipelineRunEnd}}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            {{#if HasFailedActivities}}
+            {{#each FailedActivities}}
+            <tr{{#IsOdd @index}} class="OddRow" {{ /IsOdd}}>
+                <td colspan="2">
+                    <table>
+                        <tr>
+                            <td width="150">Activity Name:</td>
+                            <td width="250">{{ActivityRunInformation.ActivityName}}</td>
+                            <td width="150">Activity Type:</td>
+                            <td width="250">{{ActivityRunInformation.ActivityType}}</td>
+                        </tr>
+                        <tr>
+                            <td width="150">Activity started:</td>
+                            <td width="250">{{ActivityStart}}</td>
+                            <td width="150">Activity finished:</td>
+                            <td width="250">{{ActivityEnd}}</td>
+                        </tr>
+                        {{#if HasActivityInputs}}
+                        <tr>
+                            <td colspan="4"><hr></td>
+                        </tr>
+                        <tr>
+                            <td width="150">Input [{{ActivityInput.VariableName}}]</td>
+                            <td width="650" colspan="3">{{ActivityInput.Value}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><hr></td>
+                        </tr>
+                        {{/if}}
+                        <tr>
+                            <td width="150">Error:</td>
+                            <td width="650" colspan="3">{{ActivityError.Message}}</td>
+                        </tr>
+                    </table>
+                </td>
+                </tr>
+                {{/each}}
+                {{else}}
+                <tr class="OddRow">
+                    <td colspan="2" align="center">There are no activity errors in this pipeline</td>
+                </tr>
+                {{/if}}
+        </table>
+    </div>
+</body>
+</html>

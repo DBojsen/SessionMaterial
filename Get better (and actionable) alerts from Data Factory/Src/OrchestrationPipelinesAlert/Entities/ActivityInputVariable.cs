@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
+// ReSharper disable UnusedMember.Global
 
-namespace OrchestrationPipelinesAlert.Entities
+namespace DBojsen.OrchestrationPipelinesAlert.Entities
 {
     public class ActivityInputVariable
     {
         [JsonPropertyName("variableName")]
-        public string VariableName { get; set; }
+        public string VariableName { get; set; } = null!;
+
         [JsonPropertyName("value")]
-        public object Value { get; set; }
+        public object Value { get; set; } = null!;
     }
 }

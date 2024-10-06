@@ -1,11 +1,6 @@
-﻿using OrchestrationPipelinesAlert.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DBojsen.OrchestrationPipelinesAlert.Entities;
 
-namespace OrchestrationPipelinesAlert.Microsoft.DataFactory
+namespace DBojsen.OrchestrationPipelinesAlert.Microsoft.DataFactory
 {
     public interface IPipelineRuns
     {

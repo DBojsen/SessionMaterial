@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Azure.Core;
-using Azure.ResourceManager.DataFactory;
+﻿using Azure.Core;
 using Azure.ResourceManager.DataFactory.Models;
-using OrchestrationPipelinesAlert.Entities;
+using DBojsen.OrchestrationPipelinesAlert.Entities;
 
-namespace OrchestrationPipelinesAlert.Microsoft.DataFactory
+namespace DBojsen.OrchestrationPipelinesAlert.Microsoft.DataFactory
 {
     internal class PipelineRuns : IPipelineRuns
     {
-        internal readonly ServiceConnector ServiceConnector = new ServiceConnector();
+        internal readonly ServiceConnector ServiceConnector = new();
 
         public List<PipelineRunFailed> GetFailedPipelineRuns(string dataFactoryResourceId, DateTime windowStartTime, DateTime windowEndTime)
         {
@@ -22,25 +16,11 @@ namespace OrchestrationPipelinesAlert.Microsoft.DataFactory
                 dataFactoryResourceIdentifier.ResourceGroupName ?? throw new InvalidOperationException(),
                 dataFactoryResourceIdentifier.Name);
 
-            var failedPipelines = new List<PipelineRunFailed>();
-
             // Query the log from data factory
-            var failedPipelineRuns = dataFactoryResource.GetPipelineRuns(new RunFilterContent(windowStartTime, windowEndTime) { Filters = { new RunQueryFilter(RunQueryFilterOperand.Status, RunQueryFilterOperator.EqualsValue, new[] { "Failed" }) } });
-            foreach (var failedPipeline in failedPipelineRuns)
-            {
-                var activities = 
-                    dataFactoryResource.GetActivityRun(
-                        failedPipeline.RunId.ToString(), 
-                        new RunFilterContent(failedPipeline.RunStartOn!.Value, failedPipeline.RunEndOn!.Value));
+            var failedPipelineRuns = dataFactoryResource.GetPipelineRuns(new RunFilterContent(windowStartTime, windowEndTime) { Filters = { new RunQueryFilter(RunQueryFilterOperand.Status, RunQueryFilterOperator.EqualsValue,
+                ["Failed"]) } });
 
-                failedPipelines.Add(new PipelineRunFailed(
-                    dataFactoryResource,
-                    failedPipeline,
-                    activities.ToList().Select(act => new ActivityRun(act)).ToList(),
-                    activities.ToList().Where(run => run.Status == "Failed").Select(act => new ActivityRun(act)).ToList()));
-            }
-
-            return failedPipelines;
+            return (from failedPipeline in failedPipelineRuns let activities = dataFactoryResource.GetActivityRun(failedPipeline.RunId.ToString(), new RunFilterContent(failedPipeline.RunStartOn!.Value, failedPipeline.RunEndOn!.Value)) select new PipelineRunFailed(dataFactoryResource, failedPipeline, activities.ToList().Select(act => new ActivityRun(act)).ToList(), activities.ToList().Where(run => run.Status == "Failed").Select(act => new ActivityRun(act)).ToList())).ToList();
         }
 
         public PipelineRunFailed GetPipelineRun(string dataFactoryResourceId, string pipelineRunId)

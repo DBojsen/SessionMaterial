@@ -3,27 +3,24 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using OrchestrationPipelinesAlert.Microsoft.DataFactory;
-using OrchestrationPipelinesAlert.Microsoft.Graph;
-using OrchestrationPipelinesAlert.Templates;
+using DBojsen.OrchestrationPipelinesAlert.Microsoft.DataFactory;
+using DBojsen.OrchestrationPipelinesAlert.Microsoft.Graph;
+using DBojsen.OrchestrationPipelinesAlert.Templates;
 using Azure;
-using Azure.Data.Tables;
-using OrchestrationPipelinesAlert.Entities;
-using OrchestrationPipelinesAlert.Microsoft.Storage;
+using DBojsen.OrchestrationPipelinesAlert.Entities;
+using DBojsen.OrchestrationPipelinesAlert.Microsoft.Storage;
 
-namespace OrchestrationPipelinesAlert.Functions
+namespace DBojsen.OrchestrationPipelinesAlert.Functions
 {
     public class PipelineFailedSendActionableMessage(ILogger<PipelineFailedSendActionableMessage> logger, IPipelineRuns pipelineRuns, IStorageConnector storageConnector)
     {
-        private readonly string _mailReciever = Environment.GetEnvironmentVariable("MicrosoftGraph_SendMailRecieverEmail") ?? throw new InvalidOperationException();
-        private readonly TemplateCompiler _templateCompiler = new TemplateCompiler();
+        private readonly string _mailReceivers = Environment.GetEnvironmentVariable("MicrosoftGraph_SendMailRecieverEmails") ?? throw new InvalidOperationException();
+        private readonly TemplateCompiler _templateCompiler = new();
 
         [Function("PipelineFailedSendActionableMessage")]
         [TableOutput("PipelineFailedAlerts", Connection = "AzureWebJobsStorage")]
         public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
         {
-            // TODO: List of recievers - reciever name + email included in action (so that it can be saved in the state who answered)
-
             try
             {
                 
@@ -44,6 +41,7 @@ namespace OrchestrationPipelinesAlert.Functions
                     {
                         var tableEntryStatus = await storageConnector.TableClient.AddEntityAsync(
                             new PipelinesAlertTableData(pipelineRunFailed.PipelineRun.RunId.ToString() ?? throw new InvalidOperationException()));
+                        if (tableEntryStatus.Status != 204) { throw new Exception("Failed to write to the table"); }
                     }
                     catch (Exception e)
                     {
@@ -60,8 +58,11 @@ namespace OrchestrationPipelinesAlert.Functions
 
                     var mailBody = _templateCompiler.CompileAdaptiveCardBody(pipelineRunFailed);
                     var mailSubject = _templateCompiler.CompileAdaptiveCardSubject(pipelineRunFailed);
-    
-                    await Mail.SendMail(mailSubject, mailBody, _mailReciever, true, logger);
+
+                    foreach (var recipient in _mailReceivers.Split(";"))
+                    {
+                        await Mail.SendMail(mailSubject, mailBody, recipient, true, logger);
+                    }
                 }
 
                 return new OkResult();

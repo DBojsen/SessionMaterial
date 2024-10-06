@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OrchestrationPipelinesAlert.Microsoft.ActionableMessages.Utilities
+﻿// ReSharper disable UnusedMember.Global
+namespace DBojsen.OrchestrationPipelinesAlert.Microsoft.ActionableMessages.Utilities
 {
     // Borrowed from https://github.com/OfficeDev/o365-actionable-messages-utilities-for-dotnet/blob/master/src/Microsoft.O365.ActionableMessages.Utilities/O365OpenIdConfiguration.cs
     internal static class O365OpenIdConfiguration

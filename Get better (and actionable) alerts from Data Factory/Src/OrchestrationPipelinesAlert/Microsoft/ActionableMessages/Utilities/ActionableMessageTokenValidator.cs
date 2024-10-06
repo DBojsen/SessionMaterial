@@ -1,16 +1,11 @@
 ﻿using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace OrchestrationPipelinesAlert.Microsoft.ActionableMessages.Utilities
+namespace DBojsen.OrchestrationPipelinesAlert.Microsoft.ActionableMessages.Utilities
 {
     // Borrowed from https://github.com/OfficeDev/o365-actionable-messages-utilities-for-dotnet/blob/master/src/Microsoft.O365.ActionableMessages.Utilities/ActionableMessageTokenValidator.cs
     internal class ActionableMessageTokenValidator
@@ -23,14 +18,14 @@ namespace OrchestrationPipelinesAlert.Microsoft.ActionableMessages.Utilities
         /// <summary>
         /// The OpenID configuration data retriever.
         /// </summary>
-        private readonly IConfigurationManager<OpenIdConnectConfiguration> configurationManager;
+        private readonly IConfigurationManager<OpenIdConnectConfiguration> _configurationManager;
 
         /// <summary>
         /// Constructor of the <see cref="ActionableMessageTokenValidator"/> class.
         /// </summary>
         public ActionableMessageTokenValidator()
         {
-            this.configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+            _configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
                 O365OpenIdConfiguration.MetadataUrl,
                 new OpenIdConnectConfigurationRetriever());
         }
@@ -42,43 +37,42 @@ namespace OrchestrationPipelinesAlert.Microsoft.ActionableMessages.Utilities
         /// <param name="configurationManager">The configuration manager to read the OpenID configuration from.</param>
         public ActionableMessageTokenValidator(IConfigurationManager<OpenIdConnectConfiguration> configurationManager)
         {
-            this.configurationManager = configurationManager ?? throw new ArgumentNullException(nameof(configurationManager));
+            _configurationManager = configurationManager ?? throw new ArgumentNullException(nameof(configurationManager));
         }
 
-        /// <inheritdoc />
+        
         public async Task<ActionableMessageTokenValidationResult> ValidateTokenAsync(
             string token,
             string targetServiceBaseUrl)
         {
             if (string.IsNullOrEmpty(token))
             {
-                throw new ArgumentException("token is null or empty.", "token");
+                throw new ArgumentException("token is null or empty.", nameof(token));
             }
 
             if (string.IsNullOrEmpty(targetServiceBaseUrl))
             {
-                throw new ArgumentException("url is null or empty.", "targetServiceBaseUrl");
+                throw new ArgumentException("url is null or empty.", nameof(targetServiceBaseUrl));
             }
 
             CancellationToken cancellationToken = default;
-            var o365OpenIdConfig = await configurationManager.GetConfigurationAsync(cancellationToken);
+            var o365OpenIdConfig = await _configurationManager.GetConfigurationAsync(cancellationToken);
             ClaimsPrincipal claimsPrincipal;
             var result = new ActionableMessageTokenValidationResult();
 
-            var parameters = new TokenValidationParameters()
+            var parameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
-                ValidIssuers = new[] { O365OpenIdConfiguration.TokenIssuer },
+                ValidIssuers = [O365OpenIdConfiguration.TokenIssuer],
                 ValidateAudience = true,
-                ValidAudiences = new[] { targetServiceBaseUrl },
+                ValidAudiences = [targetServiceBaseUrl],
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.FromMinutes(TokenTimeValidationClockSkewBufferInMinutes),
                 RequireSignedTokens = true,
-                IssuerSigningKeys = o365OpenIdConfig.SigningKeys,
+                IssuerSigningKeys = o365OpenIdConfig.SigningKeys
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            SecurityToken validatedToken = null;
 
             try
             {
@@ -87,7 +81,7 @@ namespace OrchestrationPipelinesAlert.Microsoft.ActionableMessages.Utilities
                 // iss
                 // aud
                 //
-                claimsPrincipal = tokenHandler.ValidateToken(token, parameters, out validatedToken);
+                claimsPrincipal = tokenHandler.ValidateToken(token, parameters, out _);
             }
             catch (SecurityTokenSignatureKeyNotFoundException ex)
             {
@@ -121,12 +115,12 @@ namespace OrchestrationPipelinesAlert.Microsoft.ActionableMessages.Utilities
                 return result;
             }
 
-            var identity = claimsPrincipal.Identities.OfType<ClaimsIdentity>().FirstOrDefault();
+            var identity = claimsPrincipal.Identities.FirstOrDefault();
             if (identity == null)
             {
                 Trace.TraceError("Claims not found in the token.");
                 result.Exception = new InvalidOperationException("Claims not found in the token.");
-                return null;
+                return result;
             }
 
             if (!string.Equals(GetClaimValue(identity, "appid"), O365OpenIdConfiguration.AppId, StringComparison.OrdinalIgnoreCase))
@@ -135,7 +129,8 @@ namespace OrchestrationPipelinesAlert.Microsoft.ActionableMessages.Utilities
                     "App ID does not match. Expected: {0} Actual: {1}",
                     O365OpenIdConfiguration.AppId,
                     GetClaimValue(identity, "appid"));
-                return null;
+                result.Exception = new InvalidOperationException("App ID does not match.");
+                return result;
             }
 
             result.ValidationSucceeded = true;
@@ -158,7 +153,7 @@ namespace OrchestrationPipelinesAlert.Microsoft.ActionableMessages.Utilities
         private static string GetClaimValue(ClaimsIdentity identity, string claimType)
         {
             var claim = identity.Claims.FirstOrDefault(c => c.Type == claimType);
-            return claim?.Value;
+            return claim?.Value ?? string.Empty;
         }
     }
 }

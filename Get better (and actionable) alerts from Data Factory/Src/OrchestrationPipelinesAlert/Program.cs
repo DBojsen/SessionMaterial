@@ -1,8 +1,8 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OrchestrationPipelinesAlert.Microsoft.DataFactory;
-using OrchestrationPipelinesAlert.Microsoft.Storage;
+using DBojsen.OrchestrationPipelinesAlert.Microsoft.DataFactory;
+using DBojsen.OrchestrationPipelinesAlert.Microsoft.Storage;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()

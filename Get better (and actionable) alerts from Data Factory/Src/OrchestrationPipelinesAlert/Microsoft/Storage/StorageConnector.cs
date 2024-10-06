@@ -1,6 +1,6 @@
 ﻿using Azure.Data.Tables;
 
-namespace OrchestrationPipelinesAlert.Microsoft.Storage
+namespace DBojsen.OrchestrationPipelinesAlert.Microsoft.Storage
 {
     internal class StorageConnector : IStorageConnector
     {

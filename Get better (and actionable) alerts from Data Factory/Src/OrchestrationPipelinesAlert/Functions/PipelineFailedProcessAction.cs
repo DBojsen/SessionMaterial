@@ -1,23 +1,17 @@
 using System.Net;
 using System.Net.Http.Headers;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using OrchestrationPipelinesAlert.Entities;
-using OrchestrationPipelinesAlert.Templates;
-using OrchestrationPipelinesAlert.Microsoft.DataFactory;
-using System.Diagnostics;
-using HandlebarsDotNet;
-using System.Runtime.InteropServices;
+using DBojsen.OrchestrationPipelinesAlert.Entities;
+using DBojsen.OrchestrationPipelinesAlert.Templates;
+using DBojsen.OrchestrationPipelinesAlert.Microsoft.DataFactory;
 using Azure;
-using OrchestrationPipelinesAlert.Microsoft.ActionableMessages.Utilities;
-using OrchestrationPipelinesAlert.Microsoft.Storage;
+using DBojsen.OrchestrationPipelinesAlert.Microsoft.ActionableMessages.Utilities;
+using DBojsen.OrchestrationPipelinesAlert.Microsoft.Storage;
 
-namespace OrchestrationPipelinesAlert.Functions
+namespace DBojsen.OrchestrationPipelinesAlert.Functions
 {
     public class PipelineFailedProcessAction(ILogger<PipelineFailedProcessAction> logger, IPipelineRuns pipelineRuns, IStorageConnector storageConnector)
     {
@@ -33,8 +27,8 @@ namespace OrchestrationPipelinesAlert.Functions
             // Validate that we have a bearer token.
             if (!req.Headers.Contains("Authorization")) return req.CreateResponse(HttpStatusCode.Forbidden);
 
-            var auth = req.Headers.GetValues("Authorization");
-            if (auth.Count() != 1) return req.CreateResponse(HttpStatusCode.Forbidden);
+            var auth = req.Headers.GetValues("Authorization").ToList();
+            if (auth.Count != 1) return req.CreateResponse(HttpStatusCode.Forbidden);
 
             var authHeader = AuthenticationHeaderValue.Parse(auth.First());
             if (!string.Equals(authHeader.Scheme, "Bearer", StringComparison.OrdinalIgnoreCase)) return req.CreateResponse(HttpStatusCode.Forbidden);
@@ -96,7 +90,8 @@ namespace OrchestrationPipelinesAlert.Functions
             }
 
             alertStatus.ChosenAction = actionPipeline.DecidedAction;
-            var updateResponse = await storageConnector.TableClient.UpdateEntityAsync<PipelinesAlertTableData>(alertStatus, ETag.All);
+            var updateResponse = await storageConnector.TableClient.UpdateEntityAsync(alertStatus, ETag.All);
+            if (updateResponse.Status != 204) throw new InvalidOperationException("Failed to update alert status in table storage");
 
             var cardPayload = _templateCompiler.CompileAdaptiveCardPayload(actionPipeline);
             var response = req.CreateResponse(HttpStatusCode.OK);

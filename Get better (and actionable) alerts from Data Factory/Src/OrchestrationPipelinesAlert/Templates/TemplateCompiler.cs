@@ -1,7 +1,7 @@
 ﻿using HandlebarsDotNet;
-using OrchestrationPipelinesAlert.Entities;
+using DBojsen.OrchestrationPipelinesAlert.Entities;
 
-namespace OrchestrationPipelinesAlert.Templates
+namespace DBojsen.OrchestrationPipelinesAlert.Templates
 {
     internal class TemplateCompiler
     {
@@ -36,7 +36,7 @@ namespace OrchestrationPipelinesAlert.Templates
                     options.Inverse(output, context);
             });
 
-            Handlebars.RegisterHelper("IsEvenAdaptiveCard", (output, options, context, arguments) =>
+            Handlebars.RegisterHelper("IsEvenAdaptiveCard", (output, _, _, arguments) =>
             {
                 if (arguments.Length != 1)
                 {
@@ -44,23 +44,20 @@ namespace OrchestrationPipelinesAlert.Templates
                 }
 
                 var index = arguments.At<int>(0);
-                if (index % 2 == 0)
-                    output.WriteSafeString("emphasis");
-                else
-                    output.WriteSafeString("default");
+                output.WriteSafeString(index % 2 == 0 ? "emphasis" : "default");
             });
 
-            Handlebars.RegisterHelper("NewGuid", (output, context, arguments) =>
+            Handlebars.RegisterHelper("NewGuid", (output, _, _) =>
             {
                 output.WriteSafeString(Guid.NewGuid().ToString());
             });
 
-            Handlebars.RegisterHelper("ActionableMessageOriginator", (output, context, arguments) =>
+            Handlebars.RegisterHelper("ActionableMessageOriginator", (output, _, _) =>
             {
                 output.WriteSafeString(ActionableMessageOriginator);
             });
 
-            Handlebars.RegisterHelper("AzureFunctionsRootUrl", (output, context, arguments) =>
+            Handlebars.RegisterHelper("AzureFunctionsRootUrl", (output, _, _) =>
             {
                 output.WriteSafeString(AzureFunctionsRootUrl);
             });

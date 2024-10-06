@@ -1,30 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Azure;
-using Azure.ResourceManager.DataFactory.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Azure.ResourceManager.DataFactory.Models;
+// ReSharper disable UnusedMember.Global
 
-namespace OrchestrationPipelinesAlert.Entities
+namespace DBojsen.OrchestrationPipelinesAlert.Entities
 {
-    public class ActivityRun
+    public class ActivityRun(PipelineActivityRunInformation activityRunInformation)
     {
-        public ActivityRun(PipelineActivityRunInformation activityRunInformation)
-        {
-            ActivityRunInformation = activityRunInformation;
-            
-            ActivityInput = activityRunInformation.Input.ToObjectFromJson<ActivityInputVariable>();
-            ActivityError = activityRunInformation.Error.ToObjectFromJson<ActivityError>();
-        }
-
-        public PipelineActivityRunInformation ActivityRunInformation { get; private set; }
-        public string ActivityStart => ActivityRunInformation.StartOn.Value.DateTime.ToString("yyyy-MM-dd HH:mm:ss");
-        public string ActivityEnd => ActivityRunInformation.EndOn.Value.DateTime.ToString("yyyy-MM-dd HH:mm:ss");
-        public ActivityError ActivityError { get; private set; }
-        public ActivityInputVariable? ActivityInput { get; private set; }
+        public PipelineActivityRunInformation ActivityRunInformation { get; } = activityRunInformation;
+        public string ActivityStart => ActivityRunInformation.StartOn!.Value.DateTime.ToString("yyyy-MM-dd HH:mm:ss");
+        public string ActivityEnd => ActivityRunInformation.EndOn!.Value.DateTime.ToString("yyyy-MM-dd HH:mm:ss");
+        public ActivityError ActivityError { get; private set; } = activityRunInformation.Error.ToObjectFromJson<ActivityError>();
+        // TODO: Input not deserializing properly
+        public ActivityInputVariable? ActivityInput { get; } = activityRunInformation.Input.ToObjectFromJson<ActivityInputVariable>();
         public bool HasActivityInputs => ActivityInput != null;
     }
 }

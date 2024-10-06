@@ -1,23 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
+// ReSharper disable UnusedMember.Global
 
-namespace OrchestrationPipelinesAlert.Entities
+namespace DBojsen.OrchestrationPipelinesAlert.Entities
 {
     public class ActivityError
     {
         [JsonPropertyName("errorCode")]
-        public string ErrorCode { get; set; }
+        public string ErrorCode { get; set; } = null!;
         [JsonPropertyName("message")]
-        public string Message { get; set; }
+        public string Message { get; set; } = null!;
         [JsonPropertyName("failureType")]
-        public string FailureType { get; set; }
+        public string FailureType { get; set; } = null!;
         [JsonPropertyName("target")]
-        public string Target { get; set; }
+        public string Target { get; set; } = null!;
         [JsonPropertyName("details")]
-        public string Details { get; set; }
+        public string Details { get; set; } = null!;
     }
 }

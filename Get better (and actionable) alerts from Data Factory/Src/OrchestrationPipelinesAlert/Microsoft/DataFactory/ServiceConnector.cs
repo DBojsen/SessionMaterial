@@ -1,29 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Azure.Core;
-using Azure.Identity;
+﻿using Azure.Identity;
 using Azure.ResourceManager;
 using Azure.ResourceManager.DataFactory;
-using Azure.ResourceManager.Resources;
-using Microsoft.Graph.Models;
 
-namespace OrchestrationPipelinesAlert.Microsoft.DataFactory
+namespace DBojsen.OrchestrationPipelinesAlert.Microsoft.DataFactory
 {
     internal class ServiceConnector
     {
         internal readonly DefaultAzureCredential AzureCredential;
         internal readonly ArmClient ArmClient;
-        internal readonly Dictionary<string, DataFactoryResource> DataFactoryResources = new Dictionary<string, DataFactoryResource>();
+        internal readonly Dictionary<string, DataFactoryResource> DataFactoryResources = new();
 
         public ServiceConnector()
         {
+            // ReSharper disable once JoinDeclarationAndInitializer
             DefaultAzureCredentialOptions options;
 
 #if DEBUG
-            options = new DefaultAzureCredentialOptions()
+            options = new DefaultAzureCredentialOptions
             {
                 ExcludeSharedTokenCacheCredential = true,
                 ExcludeVisualStudioCodeCredential = false,

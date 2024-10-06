@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Azure.Identity;
+﻿using Azure.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Graph.Users.Item.SendMail;
 
-namespace OrchestrationPipelinesAlert.Microsoft.Graph
+namespace DBojsen.OrchestrationPipelinesAlert.Microsoft.Graph
 {
     internal static class Mail
     {
@@ -25,7 +20,7 @@ namespace OrchestrationPipelinesAlert.Microsoft.Graph
                     new TokenCredentialOptions { AuthorityHost = AzureAuthorityHosts.AzurePublicCloud }
                 );
 
-                // Send thru Microsoft Graph
+                // Send through Microsoft Graph
                 var graphServiceClient = new GraphServiceClient(cred);
 
                 // Get variables
@@ -36,7 +31,7 @@ namespace OrchestrationPipelinesAlert.Microsoft.Graph
                 var message = new Message
                 {
                     Subject = mailSubject,
-                    Body = new ItemBody()
+                    Body = new ItemBody
                     {
                         ContentType = BodyType.Html,
                         Content = mailBody
@@ -45,7 +40,7 @@ namespace OrchestrationPipelinesAlert.Microsoft.Graph
                 };
 
                 // Send mail as the given user.
-                var mailMessage = new SendMailPostRequestBody() { Message = message, SaveToSentItems = saveInSentMail };
+                var mailMessage = new SendMailPostRequestBody { Message = message, SaveToSentItems = saveInSentMail };
                 await graphServiceClient.Users[senderOid!].SendMail.PostAsync(mailMessage);
             }
             catch (Exception ex)

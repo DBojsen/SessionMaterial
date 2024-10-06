@@ -1,26 +1,23 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using OrchestrationPipelinesAlert.Entities;
-using OrchestrationPipelinesAlert.Microsoft.ActionableMessages.Utilities;
-using OrchestrationPipelinesAlert.Templates;
+using DBojsen.OrchestrationPipelinesAlert.Entities;
+using DBojsen.OrchestrationPipelinesAlert.Microsoft.ActionableMessages.Utilities;
+using DBojsen.OrchestrationPipelinesAlert.Templates;
 using System.Net;
 using System.Net.Http.Headers;
-using OrchestrationPipelinesAlert.Microsoft.DataFactory;
-using OrchestrationPipelinesAlert.Microsoft.Storage;
+using DBojsen.OrchestrationPipelinesAlert.Microsoft.DataFactory;
+using DBojsen.OrchestrationPipelinesAlert.Microsoft.Storage;
 
-namespace OrchestrationPipelinesAlert.Functions
+namespace DBojsen.OrchestrationPipelinesAlert.Functions
 {
     public class PipelineFailedUpdateActionableMessage(
         ILogger<PipelineFailedUpdateActionableMessage> logger,
         IPipelineRuns pipelineRuns,
         IStorageConnector storageConnector)
     {
-        private readonly TemplateCompiler _templateCompiler = new TemplateCompiler();
-        private readonly IPipelineRuns _pipelineRuns = pipelineRuns;
+        private readonly TemplateCompiler _templateCompiler = new();
 
         [Function("PipelineFailedUpdateActionableMessage")]
         public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
@@ -32,8 +29,8 @@ namespace OrchestrationPipelinesAlert.Functions
             // Validate that we have a bearer token.
             if (!req.Headers.Contains("Authorization")) return req.CreateResponse(HttpStatusCode.Forbidden);
 
-            var auth = req.Headers.GetValues("Authorization");
-            if (auth.Count() != 1) return req.CreateResponse(HttpStatusCode.Forbidden);
+            var auth = req.Headers.GetValues("Authorization").ToList();
+            if (auth.Count != 1) return req.CreateResponse(HttpStatusCode.Forbidden);
 
             var authHeader = AuthenticationHeaderValue.Parse(auth.First());
             if (!string.Equals(authHeader.Scheme, "Bearer", StringComparison.OrdinalIgnoreCase)) return req.CreateResponse(HttpStatusCode.Forbidden);
@@ -62,7 +59,7 @@ namespace OrchestrationPipelinesAlert.Functions
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var refreshRequest = JsonConvert.DeserializeObject<AdaptiveCardRefreshRequest>(requestBody);
 
-            var actionPipeline = pipelineRuns.GetPipelineRun(refreshRequest.DataFactoryInstanceId, refreshRequest.PipelineRunId);
+            var actionPipeline = pipelineRuns.GetPipelineRun(refreshRequest!.DataFactoryInstanceId, refreshRequest.PipelineRunId);
 
             var alertStatusResponse = await storageConnector.TableClient.GetEntityAsync<PipelinesAlertTableData>(
                 Environment.GetEnvironmentVariable("AzureStorageTables_TableName"),

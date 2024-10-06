@@ -3,15 +3,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using OrchestrationPipelinesAlert.Microsoft.DataFactory;
-using OrchestrationPipelinesAlert.Microsoft.Graph;
-using OrchestrationPipelinesAlert.Templates;
+using DBojsen.OrchestrationPipelinesAlert.Microsoft.DataFactory;
+using DBojsen.OrchestrationPipelinesAlert.Microsoft.Graph;
+using DBojsen.OrchestrationPipelinesAlert.Templates;
 
-namespace OrchestrationPipelinesAlert.Functions
+namespace DBojsen.OrchestrationPipelinesAlert.Functions
 {
     public class PipelineFailedSendMail(ILogger<PipelineFailedSendMail> logger, IPipelineRuns pipelineRuns)
     {
-        private readonly string _mailReciever = Environment.GetEnvironmentVariable("MicrosoftGraph_SendMailRecieverEmail") ?? throw new InvalidOperationException();
+        private readonly string _mailReceivers = Environment.GetEnvironmentVariable("MicrosoftGraph_SendMailRecieverEmails") ?? throw new InvalidOperationException();
         private readonly TemplateCompiler _templateCompiler = new();
 
         [Function("PipelineFailedSendMail")]
@@ -35,7 +35,7 @@ namespace OrchestrationPipelinesAlert.Functions
                     var mailBody = _templateCompiler.CompileMailBody(pipelineRunFailed);
                     var mailSubject = _templateCompiler.CompileMailSubject(pipelineRunFailed);
 
-                    await Mail.SendMail(mailSubject, mailBody, _mailReciever, true, logger);
+                    await Mail.SendMail(mailSubject, mailBody, _mailReceivers, true, logger);
                 }
 
                 return new OkResult();

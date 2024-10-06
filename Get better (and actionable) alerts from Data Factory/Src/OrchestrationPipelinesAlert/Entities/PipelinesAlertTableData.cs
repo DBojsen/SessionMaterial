@@ -1,6 +1,6 @@
 ﻿using Azure;
 
-namespace OrchestrationPipelinesAlert.Entities
+namespace DBojsen.OrchestrationPipelinesAlert.Entities
 {
     internal class PipelinesAlertTableData : Azure.Data.Tables.ITableEntity
     {
@@ -17,14 +17,13 @@ namespace OrchestrationPipelinesAlert.Entities
 
         //ITableEntity
         public string PartitionKey { get; set; } = Environment.GetEnvironmentVariable("AzureStorageTables_TableName") ?? throw new InvalidOperationException();
-        public string RowKey { get; set; }
+        public string RowKey { get; set; } = null!;
         public DateTimeOffset? Timestamp { get; set; } = DateTimeOffset.UtcNow;
         public ETag ETag { get; set; }
 
         // Entity specific
-        public string PipelineRunId { get; set; }
-        public string ChosenAction { get; set; }
-        public string ActionUser { get; set; }
-
+        public string PipelineRunId { get; set; } = null!;
+        public string ChosenAction { get; set; } = null!;
+        public string ActionUser { get; set; } = null!;
     }
 }

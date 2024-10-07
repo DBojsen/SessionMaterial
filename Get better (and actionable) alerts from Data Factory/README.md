@@ -38,6 +38,30 @@ This project is here to help you move from the traditional *A pipeline has faile
 The current state of alerts: \
 <img src="./Documentation/AzureMonitorAlert.png" alt="Azure Monitor alert Out of the box" width="300"/>
 
+This solution can be implemented without doing **any changes** to your pipelines - it is 100% based on the telemetry gathered by Azure Monitor.
+
+It can also be used to support several instances of orchestration pipelines. (you'll need to setup the RBAC setup for each).
+This is made possible by the [common alert schema](https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/alerts-common-schema) which includes info about which Azure Resource the alert is related to, allowing the code to dynamically connect to the correct instance:
+``` json
+{
+    "schemaId": "azureMonitorCommonAlertSchema",
+    "data": {
+        "essentials": {
+            "alertTargetIDs": [
+                "/subscriptions/<subId>/resourcegroups/<rgNAme>/providers/microsoft.datafactory/factories/<adfName>"
+            ]
+        },
+        "alertContext": {
+            "condition": {
+                "windowStartTime": "2024-10-07T07:52:20.859Z",
+                "windowEndTime": "2024-10-07T07:53:20.859Z"
+            }
+        },
+        "customProperties": null
+    }
+}
+```
+*Abbreviated for clarity*
 ## Replacing Azure Monitor Alerts with informational emails
 ### The end result
 Let's first start by showing what you'll achieve by implementing this approach: \

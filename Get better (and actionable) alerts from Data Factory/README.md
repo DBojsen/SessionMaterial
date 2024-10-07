@@ -40,7 +40,7 @@ The current state of alerts: \
 
 This solution can be implemented without doing **any changes** to your pipelines - it is 100% based on the telemetry gathered by Azure Monitor.
 
-It can also be used to support several instances of orchestration pipelines. (you'll need to setup the RBAC setup for each).
+It can also be used to support several instances of orchestration pipelines. (you'll need to setup the RBAC roles for each).
 This is made possible by the [common alert schema](https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/alerts-common-schema) which includes info about which Azure Resource the alert is related to, allowing the code to dynamically connect to the correct instance:
 ``` json
 {
@@ -128,7 +128,7 @@ The following properties has to be setup:
 
 You'll need to setup an Alert on your Data Factory Instance: \
 <img src="./Documentation/CreateAlertRule.png" alt="Create a new alert rule" width="500"/> \
-The alert should trigger on *Failed pipeline runs metric* abd check every 1 minute with a lookback of 1 minute.
+The alert should trigger on *Failed pipeline runs metric* and check every 1 minute with a lookback of 1 minute.
 
 Skip the notifications step, where you would normally configure email notifications: \
 <img src="./Documentation/CreateActionGroup-SkipNotifications.png" alt="Do not set up any notifications" width="500"/>
@@ -145,6 +145,10 @@ You can here just select the desired function (PipelineFailedSendMail).  Be sure
 Let's first start by showing what you'll achieve by implementing this approach: \
 <img src="./Documentation/ActionableMessage.png" alt="An actionable message allows you to take action, right from within your mailbox" width="500"/> 
 
+The buttons can be configured to perform any action you can express in code. \
+The only one that works out-of-the-box is the [Rerun failed pipeline] button, the others are there just as a showcase.
+
+Whenever a recipient opens this message, the status of the alert and remediation is checked again, in case someone else has already responded to the alert.
 ### Prerequisites
 
 #### Register as an Actionable Message sender in your Organization
@@ -171,7 +175,7 @@ See [Sending mails through Microsoft Graph](#sending-mails-through-microsoft-gra
 See [Infrastructure](#infrastructure).
 
 #### RBAC Permissions
-In addition to the `Monitoring Reader` role mentioned [here](#rbac-permissions), you'll also need to grant the Azure Function Apps Managed Identity the `Data Factory Contributor` role.
+In addition to the `Monitoring Reader` role mentioned [here](#rbac-permissions), you'll also need to grant the Azure Function Apps Managed Identity the `Data Factory Contributor` role to be able to rerun the failed pipelines.
 
 #### You need to deploy 
 See [You need to deploy](#you-need-to-deploy).
@@ -194,7 +198,7 @@ In addition to the properties mentioned [here](#azure-function-application-prope
 {
     "Values": {
         "ActionableMessageOriginator": "Originator Id from application setup under prerequisites",
-        "AzureStorageTables_TableName":  "Tenant Id from application setup under prerequisites"
+        "AzureStorageTables_TableName":  "A table name of your choise - my suggestion is PipelineFailedAlerts"
     }
 }
 ```

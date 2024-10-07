@@ -119,7 +119,7 @@ The following properties has to be setup:
         "MicrosoftGraph_SendMailClientSecret": "Client Secret from application setup under prerequisites",
         "MicrosoftGraph_SendMailSenderObjectId": "Object Id of sender from application setup under prerequisites",
         "MicrosoftGraph_SendMailSenderEmail":  "Email Address of sender from application setup under prerequisites",
-        "MicrosoftGraph_SendMailRecieverEmails": "Semi-colon separated list of receivers of the alerts"
+        "MicrosoftGraph_SendMailReceiverEmails": "Semi-colon separated list of receivers of the alerts"
     }
 }
 ```

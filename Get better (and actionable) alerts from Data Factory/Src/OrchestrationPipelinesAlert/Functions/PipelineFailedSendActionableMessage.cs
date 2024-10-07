@@ -14,7 +14,7 @@ namespace DBojsen.OrchestrationPipelinesAlert.Functions
 {
     public class PipelineFailedSendActionableMessage(ILogger<PipelineFailedSendActionableMessage> logger, IPipelineRuns pipelineRuns, IStorageConnector storageConnector)
     {
-        private readonly string _mailReceivers = Environment.GetEnvironmentVariable("MicrosoftGraph_SendMailRecieverEmails") ?? throw new InvalidOperationException();
+        private readonly string _mailReceivers = Environment.GetEnvironmentVariable("MicrosoftGraph_SendMailReceiverEmails") ?? throw new InvalidOperationException();
         private readonly TemplateCompiler _templateCompiler = new();
 
         [Function("PipelineFailedSendActionableMessage")]

@@ -17,8 +17,10 @@
   - [Replacing Azure Monitor Alerts with Actionable Messages](#replacing-azure-monitor-alerts-with-actionable-messages)
     - [The end result](#the-end-result-1)
     - [Prerequisites](#prerequisites-1)
-      - [Sending mails through Microsoft Graph](#sending-mails-through-microsoft-graph-1)
       - [Register as an Actionable Message sender in your Organization](#register-as-an-actionable-message-sender-in-your-organization)
+        - [Creating an Originator](#creating-an-originator)
+        - [Get it approved by your Exchange Admin](#get-it-approved-by-your-exchange-admin)
+      - [Sending mails through Microsoft Graph](#sending-mails-through-microsoft-graph-1)
       - [Infrastructure](#infrastructure-1)
       - [RBAC Permissions](#rbac-permissions-1)
       - [You need to deploy](#you-need-to-deploy-1)
@@ -65,7 +67,7 @@ In order to use this setup, you'll need:
 
 #### RBAC Permissions
 
-In order to be able to query the telemetry from Data Factory, the Function Apps Managed Identity needs to be granted the **Monitoring Reader** role on the Data Factory Instance.
+In order to be able to query the telemetry from Data Factory, the Function Apps Managed Identity needs to be granted the `Monitoring Reader` role on the Data Factory Instance.
 
 #### You need to deploy 
 
@@ -74,7 +76,6 @@ The Azure Functions project available in the Src folder.
 ### Implementation
 
 #### Templates
-
 To set your own design on the email that is sent, you'll need to update the following templates:
 * [ErrorMailBody.html](./Src/OrchestrationPipelinesAlert/Templates/Mail/ErrorMailBody.html)
 * [ErrorMailSubject.txt](./Src/OrchestrationPipelinesAlert/Templates/Mail/ErrorMailSubject.txt)
@@ -94,7 +95,7 @@ The following properties has to be setup:
         "MicrosoftGraph_SendMailClientSecret": "Client Secret from application setup under prerequisites",
         "MicrosoftGraph_SendMailSenderObjectId": "Object Id of sender from application setup under prerequisites",
         "MicrosoftGraph_SendMailSenderEmail":  "Email Address of sender from application setup under prerequisites",
-        "MicrosoftGraph_SendMailRecieverEmail": "Semi-colon separated list of receivers of the alerts"
+        "MicrosoftGraph_SendMailRecieverEmails": "Semi-colon separated list of receivers of the alerts"
     }
 }
 ```
@@ -122,28 +123,60 @@ Let's first start by showing what you'll achieve by implementing this approach: 
 
 ### Prerequisites
 
-#### Sending mails through Microsoft Graph
-
 #### Register as an Actionable Message sender in your Organization
-https://aka.ms/publishoam
+##### Creating an Originator
+Navigate to the [Actionable Email Developer Dashboard](https://aka.ms/publishoam) and click [New Provider]
+<img src="./Documentation/ActionableMessageOriginatorNew.png" alt="Create a new alert rule" width="500"/> \
+
+Fill in all the required info, be sure to select that you want to use the **Organization** scope: \
+<img src="./Documentation/ActionableMessageOriginatorDetails.png" alt="Create a new alert rule" width="500"/> \
+
+Copy the **Provider Id (originator)** guid, you'll need it later.
+
+##### Get it approved by your Exchange Admin
+Do as it says on the page: \
+**Note for Organization scoped AM registration** \
+For faster approval, please ask your Exchange admins to approve your request here: https://outlook.office.com/connectors/oam/admin
+
+(And probably bring cake, that typically helps...)
+
+#### Sending mails through Microsoft Graph
+See [Sending mails through Microsoft Graph](#sending-mails-through-microsoft-graph).
 
 #### Infrastructure
-
-*I have not yet found the time to include IaC templates to this project, but I do accept pull requests.*
+See [Infrastructure](#infrastructure).
 
 #### RBAC Permissions
+In addition to the `Monitoring Reader` role mentioned [here](#rbac-permissions), you'll also need to grant the Azure Function Apps Managed Identity the `Data Factory Contributor` role.
 
 #### You need to deploy 
+See [You need to deploy](#you-need-to-deploy).
 
 ### Implementation
 
 #### Templates
+To set your own design on the email that is sent, you'll need to update the following templates:
+* [ErrorMailBody.html](<./Src/OrchestrationPipelinesAlert/Templates/Adaptive Cards/ErrorMailBody.html>)
+* [ErrorMailSubject.txt](<./Src/OrchestrationPipelinesAlert/Templates/Adaptive Cards/ErrorMailSubject.txt>)
+
+And, if you are really brave, you can also update the template for the Adaptive Card/Actionable Message here: [PipelineFailedAdaptiveCard.json](<./Src/OrchestrationPipelinesAlert/Templates/Adaptive Cards/PipelineFailedAdaptiveCard.json>).  If you do decide to do so, please validate your changes in the [Actionable Message Designer](https://amdesigner.azurewebsites.net/)
 
 #### Configuration
 
 ##### Azure Function Application Properties
 
+In addition to the properties mentioned [here](#azure-function-application-properties), you also need to specify your originator id and the table name to store the state of each alert in (the table will be automatically created in the storage account connected to the Function App):
+```json
+{
+    "Values": {
+        "ActionableMessageOriginator": "Originator Id from application setup under prerequisites",
+        "AzureStorageTables_TableName":  "Tenant Id from application setup under prerequisites"
+    }
+}
+```
+
 ##### Azure Monitor Alert
+See [Azure Monitor Alert](#azure-monitor-alert), but instead of connection to the `PipelineFailedSendMail` function, you should use the `PipelineFailedSendActionableMessage` function.
 
 ## 3rd party libraries
 
